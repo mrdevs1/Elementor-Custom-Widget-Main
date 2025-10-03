@@ -1,0 +1,89 @@
+<?php
+
+/*Elementor-Custom-Widget-Main
+Updated Version */
+
+
+
+/**
+ * Plugin Name: DevBid Elementor Custom Widgets
+ * Description: A simple plugin to add custom widgets to Elementor.
+ * Version: 1.0.0
+ * Author: MR Dev
+ * Author URI: https://devbid.net
+ * Text Domain: mrdevs-widgets
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly.
+}
+
+/**
+ * Check if Elementor is active.
+ */
+function dnew_check_dependencies() {
+    if ( ! did_action( 'elementor/loaded' ) ) {
+        add_action( 'admin_notices', 'dnew_missing_elementor_notice' );
+        return;
+    }
+}
+add_action( 'plugins_loaded', 'dnew_check_dependencies' );
+
+/**
+ * Display admin notice if Elementor is not active.
+ */
+function dnew_missing_elementor_notice() {
+    echo '<div class="notice notice-error"><p>';
+    esc_html_e( 'DevBid Elementor Custom Widgets requires Elementor to be installed and activated.', 'mrdevs-widgets' );
+    echo '</p></div>';
+}
+
+/**
+ * Register custom category for widgets.
+ */
+function dnew_register_category( $elements_manager ) {
+    $elements_manager->add_category(
+        'devnahian-category',
+        [
+            'title' => esc_html__( 'DevBid Widgets', 'mrdevs-widgets' ),
+            'icon'  => 'eicon-star',
+        ]
+    );
+}
+add_action( 'elementor/elements/categories_registered', 'dnew_register_category' );
+
+/**
+ * Register custom widgets.
+ */
+function dnew_register_widgets( $widgets_manager ) {
+    require_once __DIR__ . '/widgets/blog-grid-widget.php';
+    require_once __DIR__ . '/widgets/plugin-info-widget.php';
+
+    // Register your widget class.
+    $widgets_manager->register( new \DNEW_Blog_Grid_Widget() );
+    $widgets_manager->register( new \DNEW_Plugin_Info_Widget() );
+}
+add_action( 'elementor/widgets/register', 'dnew_register_widgets' );
+
+/**
+ * Enqueue frontend styles and scripts
+ */
+function dnew_enqueue_scripts() {
+    // CSS
+    wp_enqueue_style(
+        'dnew-widgets-style',
+        plugin_dir_url( __FILE__ ) . 'assets/css/widgets-style.css',
+        [],
+        '1.0.0'
+    );
+
+    // JS
+    wp_enqueue_script(
+        'dnew-widgets-script',
+        plugin_dir_url( __FILE__ ) . 'assets/js/widgets-script.js',
+        [ 'jquery' ], // dependencies
+        '1.0.0',
+        true // load in footer
+    );
+}
+add_action( 'wp_enqueue_scripts', 'd
